@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhD Scholar Management Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span>🎓</span><div>PhD Scholar<br><small>Management Dashboard</small></div></div>
+    <nav>
+      <button class="nav active" data-section="overview">Overview</button>
+      <button class="nav" data-section="scholars">Scholars</button>
+      <button class="nav" data-section="publications">Publications</button>
+      <button class="nav" data-section="deadlines">Deadlines</button>
+    </nav>
+    <div class="sidebar-note">V1 Prototype<br><small>Google Sheets-ready</small></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">PhD Research Dashboard</h1>
+        <p>Track scholar progress, coursework, RAC, research and publications.</p>
+      </div>
+      <div class="controls">
+        <select id="guideFilter"><option value="">All Guides</option></select>
+        <select id="yearFilter"><option value="">All PhD Years</option></select>
+        <input id="globalSearch" placeholder="🔎 Search scholar...">
+      </div>
+    </header>
+
+    <section id="overview" class="section active">
+      <div class="cards" id="kpis"></div>
+      <div class="grid two">
+        <div class="panel"><h2>Scholar Progress</h2><canvas id="progressChart"></canvas></div>
+        <div class="panel"><h2>Publication Mix</h2><canvas id="pubTypeChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Scholars</h2><button class="ghost" id="clearFilters">Clear filters</button></div>
+        <div id="scholarCards" class="scholar-grid"></div>
+      </div>
+    </section>
+
+    <section id="scholars" class="section">
+      <div class="panel">
+        <div class="panel-head"><h2>Scholar Directory</h2><span id="resultCount"></span></div>
+        <div id="scholarTable"></div>
+      </div>
+    </section>
+
+    <section id="publications" class="section">
+      <div class="panel">
+        <div class="panel-head"><h2>Publication Tracker</h2><span id="pubCount"></span></div>
+        <div id="publicationTable"></div>
+      </div>
+    </section>
+
+    <section id="deadlines" class="section">
+      <div class="panel">
+        <div class="panel-head"><h2>Upcoming Deadlines</h2></div>
+        <div id="deadlineTable"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <button class="close" id="closeModal">×</button>
+    <div id="profile"></div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

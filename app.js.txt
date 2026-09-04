@@ -1,0 +1,95 @@
+const scholars = [
+ {id:"PHDS001",name:"Manish Sunkapur",dept:"Management",guide:"Dr. Silky Sharma",type:"Full-time",year:2,topic:"AI Readiness, Implementation and Value Realization in Manufacturing Enterprises",edu:"MBA – HR & Marketing; BE – Computer Science",experience:"7+ years",progress:62,coursework:"4/4",rac:"RAC-1 Completed",research:"Framework Development"},
+ {id:"PHDS002",name:"Ananya Rao",dept:"Management",guide:"Dr. Silky Sharma",type:"Full-time",year:3,topic:"Digital HR Transformation",edu:"MBA – HR",experience:"4 years",progress:78,coursework:"4/4",rac:"RAC-3 Completed",research:"Data Collection"},
+ {id:"PHDS003",name:"Rahul Kumar",dept:"Finance",guide:"Dr. Arun Kumar",type:"Part-time",year:1,topic:"FinTech Adoption in SMEs",edu:"M.Com",experience:"9 years",progress:35,coursework:"3/4",rac:"RAC-1 Completed",research:"Literature Review"},
+ {id:"PHDS004",name:"Priya Nair",dept:"Management",guide:"Dr. Meera Rao",type:"Full-time",year:2,topic:"Sustainable Supply Chain Analytics",edu:"MBA – Operations",experience:"3 years",progress:55,coursework:"4/4",rac:"RAC-2 Completed",research:"Methodology"},
+ {id:"PHDS005",name:"Vikram Shah",dept:"Computer Science",guide:"Dr. Arun Kumar",type:"Full-time",year:1,topic:"AI Applications in Smart Manufacturing",edu:"M.Tech – AI",experience:"2 years",progress:29,coursework:"2/4",rac:"RAC-1 Pending",research:"SLR"}
+];
+
+const publications = [
+ {scholar:"PHDS001",title:"AI Readiness and Value Realization for Manufacturing Enterprises",type:"Book Chapter",venue:"Wiley / Scrivener",publisher:"Wiley",indexing:"Other",quartile:"NA",deadline:"2026-10-31",submitted:"2026-07-15",status:"Submitted"},
+ {scholar:"PHDS001",title:"AI Adoption in Manufacturing: A Review",type:"Review Article",venue:"Target Journal",publisher:"Elsevier",indexing:"Scopus",quartile:"Q1",deadline:"2026-09-30",submitted:"",status:"Under Review"},
+ {scholar:"PHDS002",title:"Digital HR Ecosystems",type:"Book Chapter",venue:"Academic Book",publisher:"Cambridge",indexing:"Other",quartile:"NA",deadline:"2026-09-20",submitted:"2026-08-28",status:"Submitted"},
+ {scholar:"PHDS003",title:"FinTech Adoption in SMEs",type:"Journal Article",venue:"Target Journal",publisher:"Springer",indexing:"Scopus",quartile:"Q2",deadline:"2026-09-25",submitted:"",status:"Planned"},
+ {scholar:"PHDS004",title:"Supply Chain Analytics and Sustainability",type:"Conference Paper",venue:"Management Conference",publisher:"Conference Organizer",indexing:"Other",quartile:"NA",deadline:"2026-09-18",submitted:"2026-09-05",status:"Submitted"},
+ {scholar:"PHDS005",title:"Smart Manufacturing AI",type:"Journal Article",venue:"Target Journal",publisher:"Emerald",indexing:"Scopus",quartile:"Q1",deadline:"2026-10-10",submitted:"",status:"Draft"}
+];
+
+const deadlines = [
+ {scholar:"PHDS001",area:"Publication",activity:"Q1 journal submission",date:"2026-09-30",status:"Upcoming"},
+ {scholar:"PHDS001",area:"RAC",activity:"RAC-2 preparation",date:"2026-10-05",status:"Upcoming"},
+ {scholar:"PHDS002",area:"Publication",activity:"Book chapter deadline",date:"2026-09-20",status:"Upcoming"},
+ {scholar:"PHDS004",area:"Conference",activity:"Conference paper",date:"2026-09-18",status:"Submitted"}
+];
+
+let filteredScholars=[...scholars];
+
+const $=id=>document.getElementById(id);
+function initials(n){return n.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase()}
+function scholarMap(){return Object.fromEntries(scholars.map(s=>[s.id,s]))}
+function badge(status){
+ const cls=/Completed|Published|Accepted|Submitted/.test(status)?"ok":/Pending|Upcoming|Draft|Review|Revision/.test(status)?"warn":/Rejected|Overdue/.test(status)?"danger":"";
+ return `<span class="badge ${cls}">${status}</span>`;
+}
+function applyFilters(){
+ const q=$("globalSearch").value.toLowerCase();
+ const g=$("guideFilter").value, y=$("yearFilter").value;
+ filteredScholars=scholars.filter(s=>(!q||[s.name,s.id,s.topic,s.dept].join(" ").toLowerCase().includes(q))&&(!g||s.guide===g)&&(!y||String(s.year)===y));
+ renderAll();
+}
+function renderKpis(){
+ const avg=Math.round(scholars.reduce((a,s)=>a+s.progress,0)/scholars.length);
+ $("kpis").innerHTML=[
+ ["Total Scholars",scholars.length],["Active Scholars",scholars.length],["Average Progress",avg+"%"],["Publications",publications.length],
+ ["Scopus",publications.filter(p=>p.indexing==="Scopus").length],["Q1",publications.filter(p=>p.quartile==="Q1").length],["Submitted / Review",publications.filter(p=>["Submitted","Under Review","Revision"].includes(p.status)).length],["Coursework Complete",scholars.filter(s=>s.coursework==="4/4").length+"/"+scholars.length]
+ ].map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div></div>`).join("");
+}
+function renderCards(){
+ $("scholarCards").innerHTML=filteredScholars.map(s=>`<div class="scholar-card" onclick="openProfile('${s.id}')">
+ <div class="person"><div class="avatar">${initials(s.name)}</div><div><div class="name">${s.name}</div><div class="muted">${s.dept} · Year ${s.year}</div></div></div>
+ <div class="progress"><span style="width:${s.progress}%"></span></div><div class="mini"><span>Overall progress</span><b>${s.progress}%</b></div>
+ <div class="mini" style="margin-top:9px"><span>${s.rac}</span><span>${s.coursework}</span></div></div>`).join("")||"<p class='muted'>No scholars match the filters.</p>";
+}
+function renderScholarTable(){
+ const sm=scholarMap();
+ $("resultCount").textContent=`${filteredScholars.length} scholars`;
+ $("scholarTable").innerHTML=`<table><thead><tr><th>Scholar</th><th>Guide</th><th>Year</th><th>Type</th><th>Research Stage</th><th>Progress</th><th>RAC</th></tr></thead><tbody>${filteredScholars.map(s=>`<tr onclick="openProfile('${s.id}')" style="cursor:pointer"><td><b>${s.name}</b><br><span class="muted">${s.id}</span></td><td>${s.guide}</td><td>${s.year}</td><td>${s.type}</td><td>${s.research}</td><td>${s.progress}%</td><td>${badge(s.rac.replace("RAC-1 ",""))}</td></tr>`).join("")}</tbody></table>`;
+}
+function renderPubs(){
+ const ids=new Set(filteredScholars.map(s=>s.id)), sm=scholarMap(), rows=publications.filter(p=>ids.has(p.scholar));
+ $("pubCount").textContent=`${rows.length} records`;
+ $("publicationTable").innerHTML=`<table><thead><tr><th>Scholar</th><th>Title</th><th>Type</th><th>Publisher</th><th>Indexing</th><th>Quartile</th><th>Deadline</th><th>Submitted</th><th>Status</th></tr></thead><tbody>${rows.map(p=>`<tr><td>${sm[p.scholar].name}</td><td><b>${p.title}</b><br><span class="muted">${p.venue}</span></td><td>${p.type}</td><td>${p.publisher}</td><td>${p.indexing}</td><td>${p.quartile}</td><td>${p.deadline}</td><td>${p.submitted||"—"}</td><td>${badge(p.status)}</td></tr>`).join("")}</tbody></table>`;
+}
+function renderDeadlines(){
+ const ids=new Set(filteredScholars.map(s=>s.id)), sm=scholarMap(), rows=deadlines.filter(d=>ids.has(d.scholar)).sort((a,b)=>a.date.localeCompare(b.date));
+ $("deadlineTable").innerHTML=`<table><thead><tr><th>Scholar</th><th>Area</th><th>Activity</th><th>Deadline</th><th>Status</th></tr></thead><tbody>${rows.map(d=>`<tr><td>${sm[d.scholar].name}</td><td>${d.area}</td><td>${d.activity}</td><td>${d.date}</td><td>${badge(d.status)}</td></tr>`).join("")}</tbody></table>`;
+}
+function renderCharts(){
+ const ctx1=$("progressChart"); if(window.progressChart)window.progressChart.destroy();
+ window.progressChart=new Chart(ctx1,{type:"bar",data:{labels:filteredScholars.map(s=>s.name.split(" ")[0]),datasets:[{label:"Progress %",data:filteredScholars.map(s=>s.progress)}]},options:{responsive:true,scales:{y:{beginAtZero:true,max:100}}}});
+ const types={}; publications.filter(p=>filteredScholars.some(s=>s.id===p.scholar)).forEach(p=>types[p.type]=(types[p.type]||0)+1);
+ const ctx2=$("pubTypeChart"); if(window.pubTypeChart)window.pubTypeChart.destroy();
+ window.pubTypeChart=new Chart(ctx2,{type:"doughnut",data:{labels:Object.keys(types),datasets:[{data:Object.values(types)}]},options:{responsive:true}});
+}
+function renderAll(){renderKpis();renderCards();renderScholarTable();renderPubs();renderDeadlines();renderCharts()}
+function openProfile(id){
+ const s=scholarMap()[id], pubs=publications.filter(p=>p.scholar===id);
+ $("profile").innerHTML=`<div class="profile-head"><div class="avatar">${initials(s.name)}</div><div><h2 style="margin:0">${s.name}</h2><div class="muted">${s.id} · ${s.dept} · ${s.type}</div></div></div>
+ <div class="profile-grid">
+ <div class="info"><b>Guide</b>${s.guide}</div><div class="info"><b>PhD Year</b>${s.year}</div>
+ <div class="info"><b>Research Topic</b>${s.topic}</div><div class="info"><b>Education</b>${s.edu}</div>
+ <div class="info"><b>Experience</b>${s.experience}</div><div class="info"><b>Overall Progress</b>${s.progress}%</div>
+ <div class="info"><b>Coursework</b>${s.coursework} — 2 Mandatory + 2 Background</div><div class="info"><b>RAC</b>${s.rac}</div>
+ </div>
+ <div class="tabs"><span class="tab">Coursework</span><span class="tab">RAC</span><span class="tab">Research</span><span class="tab">Publications</span><span class="tab">Thesis</span></div>
+ <h3>Publications (${pubs.length})</h3>
+ <table class="small-table"><thead><tr><th>Title</th><th>Type</th><th>Publisher</th><th>Indexing</th><th>Quartile</th><th>Status</th></tr></thead><tbody>${pubs.map(p=>`<tr><td>${p.title}</td><td>${p.type}</td><td>${p.publisher}</td><td>${p.indexing}</td><td>${p.quartile}</td><td>${badge(p.status)}</td></tr>`).join("")||"<tr><td colspan='6'>No publications recorded.</td></tr>"}</tbody></table>`;
+ $("modal").classList.remove("hidden");
+}
+document.querySelectorAll(".nav").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".nav").forEach(b=>b.classList.remove("active"));btn.classList.add("active");document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));$(btn.dataset.section).classList.add("active");$("pageTitle").textContent=btn.textContent==="Overview"?"PhD Research Dashboard":btn.textContent}));
+$("globalSearch").addEventListener("input",applyFilters);$("guideFilter").addEventListener("change",applyFilters);$("yearFilter").addEventListener("change",applyFilters);
+$("clearFilters").addEventListener("click",()=>{$("globalSearch").value="";$("guideFilter").value="";$("yearFilter").value="";applyFilters()});
+$("closeModal").addEventListener("click",()=>$("modal").classList.add("hidden"));$("modal").addEventListener("click",e=>{if(e.target.id==="modal")$("modal").classList.add("hidden")});
+const guides=[...new Set(scholars.map(s=>s.guide))];guides.forEach(g=>$("guideFilter").insertAdjacentHTML("beforeend",`<option>${g}</option>`));
+[...new Set(scholars.map(s=>s.year))].sort().forEach(y=>$("yearFilter").insertAdjacentHTML("beforeend",`<option>${y}</option>`));
+renderAll();
